@@ -12,10 +12,12 @@ const getAspectRatio = (image: Record<string, any>): number => image.identify.si
 
 async function migrateThumbnails(total: number, current: number): Promise<any> {
 	const thumbs: any[] = [];
+
 	const cursor = await Uploads.find(
 		{ typeGroup: 'image', uploadedAt: { $gte: new Date('2021-08-31T00:00:00.000Z') } },
 		{ sort: { rid: 1 } },
 	);
+
 	const currentImages = await cursor.skip(current).limit(batchSize).toArray();
 
 	await Promise.all(
@@ -32,6 +34,7 @@ async function migrateThumbnails(total: number, current: number): Promise<any> {
 							filter: { _id: thumb._id },
 							update: {
 								$set: {
+									originalFileId: image._id,
 									_hidden: true,
 								},
 							},
